@@ -81,11 +81,15 @@ class Graph:
         est = time.process_time()
         st = time.time()
         print(f"Using brute force to solve traveling salesman problem for current graph")
+        print("Progress: |", end="")
+        progress = 0
         min_dist = -1
         nodes = [node for node in range(self.size)]
         path = []
         for node in nodes:
-            print(f"Progress at {(node / self.size) * 100}%")
+            new_progress = int((node / self.size) * 2)
+            for i in range(new_progress - progress):
+                print("-", end="")
             remaining = nodes.copy()
             remaining.remove(node)
             curr_path = self.brute_force_recurse(node, remaining, min_dist)
@@ -98,6 +102,7 @@ class Graph:
         et = time.time()
         res = et - st
         eres = eet - est
+        print("|")
         print(f"Execution Time: {res} seconds")
         print(f"CPU Execution Time: {eres} seconds\n\n")
         return [min_dist, path]
@@ -136,11 +141,15 @@ class Graph:
         est = time.process_time()
         st = time.time()
         print("Using nearest neighbor to find traveling salesman problem solution for current graph")
+        print("Progress: |", end="")
+        progress = 0
         nodes = [node for node in range(self.size)]
         min_path_dist = -1
         path = []
         for node in nodes:
-            print(f"Progress at {(node / self.size) * 100}%")
+            new_progress = int((node / self.size) * 2)
+            for i in range(new_progress - progress):
+                print("-", end="")
             new_path = [node]
             path_dist = 0
             remaining = nodes.copy()
@@ -165,6 +174,7 @@ class Graph:
         et = time.time()
         res = et - st
         eres = eet - est
+        print("|")
         print(f"Execution Time: {res} seconds")
         print(f"CPU Execution Time: {eres} seconds\n\n")
         return [min_path_dist, path]
@@ -173,11 +183,16 @@ class Graph:
         est = time.process_time()
         st = time.time()
         print("Using nearest neighborhood to find traveling salesman problem solution for current graph")
+        print(f"Size of neighborhood: {neighborhood_size}")
+        print("Progress: |", end="")
+        progress = 0
         nodes = [node for node in range(self.size)]
         min_path_dist = -1
         path = []
         for node in nodes:
-            print(f"Progress at {(node / self.size) * 100}%")
+            new_progress = int((node / self.size)*2)
+            for i in range(new_progress - progress):
+                print("-", end="")
             new_path = [node]
             path_dist = 0
             remaining = nodes.copy()
@@ -206,8 +221,9 @@ class Graph:
         et = time.time()
         res = et - st
         eres = eet - est
+        print("|")
         print(f"Execution Time: {res} seconds")
-        print(f"CPU Execution Time: {eres} seconds\n\n")
+        print(f"CPU Execution Time: {eres} seconds")
         return [min_path_dist, path]
 
     def nearest_neighborhood_recurse(self, origin, remaining, dist_budget, level):
@@ -248,14 +264,32 @@ class Graph:
             else:
                 return [False]
 
+    def count_up_nearest_neighborhood(self):
+        min_size = -1
+        min_hood_size = -1
+        min_path = []
+        for i in range(20):
+            new_path = self.nearest_neighborhood(1 + i)
+            if new_path[0] < min_size or min_size == -1:
+                min_size = new_path[0]
+                min_path = new_path[1]
+                min_hood_size = i + 1
+                print(f"This is a new minimum path length of {min_size} from neighborhood size {i + 1}:")
+                print(min_path)
+            else:
+                print(f"Path is size {new_path[0]} from neighborhood size {i + 1}:")
+                print(new_path[1])
+                print(f"Min path is size {min_size} from neighborhood size {min_hood_size}:")
+                print(min_path)
+            print("\n\n")
+
 
 def main():
     g = Graph()
-    g.read_graph_section("Size150.graph", 15)
+    g.read_graph_section("Size100.graph", 25)
     print(g)
-    print(g.brute_force_tsp())
     print(g.nearest_neighbor())
-    print(g.nearest_neighborhood(10))
+    g.count_up_nearest_neighborhood()
 
 
 main()
